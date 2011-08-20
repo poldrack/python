@@ -19,4 +19,9 @@ and wait for it to finish
 setup_subject.py: a script to perform preprocessing and setup for
 a full fMRI study.  this is a recent port of the setup_subject 
 script from UCLA, and has not been thoroughly tested yet.
+It makes a number of assumptions about the DICOM structure which
+are true of GE data but probably will not work without modification
+for any other systems.
 
+fsld: this is an R script used by setup_subject.py to perform data
+diagnostics, but it could also be used in standalone mode.
