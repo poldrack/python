@@ -1,1 +1,6 @@
 This is various python code related to data processing and analysis.
+
+deface.py: this performing defacing of an anatomical image using a 
+custom mask developed at UT.  you will need to grab the template
+and mask from the data directory and then change the paths to those
+images in the code
