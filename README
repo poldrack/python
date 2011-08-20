@@ -4,3 +4,19 @@ deface.py: this performing defacing of an anatomical image using a
 custom mask developed at UT.  you will need to grab the template
 and mask from the data directory and then change the paths to those
 images in the code
+
+launch.py: this is an experimental front-end for the launch_qsub
+function to allow it to be used from the command line.  not well 
+tested yet.
+
+launch_qsub.py: code to launch SGE jobs from within python. This is
+customized for the TACC system and will require modification to run
+on any other system.
+
+run_shell_cmd.py: simple front end to Popen to run shell command
+and wait for it to finish
+
+setup_subject.py: a script to perform preprocessing and setup for
+a full fMRI study.  this is a recent port of the setup_subject 
+script from UCLA, and has not been thoroughly tested yet.
+
