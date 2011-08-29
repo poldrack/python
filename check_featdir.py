@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-""" check_all_featdirs.py - check all first-level feat dirs
+""" check_featdir.py - check a first-level feat dir
 
-USAGE: check_featdir <basedir>
+USAGE: check_featdir <featdir>
 """
 
 ## Copyright 2011, Russell Poldrack. All rights reserved.
@@ -27,52 +27,70 @@ USAGE: check_featdir <basedir>
 ## ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os,sys
-import numpy as N
+from mvpa.misc.fsl.base import read_fsl_design
 
-from check_featdir import *
 
 def usage():
     """ print the docstring and exit"""
     sys.stdout.write(__doc__)
     sys.exit(2)
 
-
 def main():
     if len(sys.argv)<2:
         usage()
 
-    check_all_featdirs(sys.argv[1])
-    
-def check_all_featdirs(basedir):
-    if not os.path.exists(basedir):
-        print basedir+' does not exist!'
-        usage()
-    if basedir[-1]=='/':
-        basedir=basedir[:-1]
-        
-    featdirs=[]
-    for d in os.listdir(basedir):
-        if d[0:3]=='sub':
-            for m in os.listdir('%s/%s/model/'%(basedir,d)):
-                if m[-5:]=='.feat':
-                    #print 'found %s/%s/model/%s'%(basedir,d,m)
-                    featdirs.append('%s/%s/model/%s'%(basedir,d,m))
-
-    badness={}
-    status={}
-    print 'checking %d featdirs...'%len(featdirs)
-    for f in featdirs:
-        badness[f],status[f]=check_featdir(f)
-    if N.sum(badness.values())==0:
+    badness,status=check_featdir(sys.argv[1])
+    if badness==0:
         print 'no problems found'
     else:
-      for f in featdirs:
-        if badness[f]>0:
-            print 'problem with %s'%f
-            print status[f]
-    
-    return badness,status
+        print 'problem found'
+        print status
 
+def check_featdir(featdir):
+
+    if not os.path.exists(featdir+'/design.fsf'):
+        print featdir+'/design.fsf does not exist!'
+        usage()
+    
+    design=read_fsl_design(featdir+'/design.fsf')
+
+    status={}
+    badness=0
+    
+    status['subdirs']={}
+    subdirs_to_check=['reg','stats']
+    for s in subdirs_to_check:
+        if not os.path.exists(featdir+'/'+s):
+            status['subdirs'][s]=0
+            print 'missing: '+featdir+'/'+s
+            badness+=1
+        else:
+            status['subdirs'][s]=1
+
+    status['files']={}
+    files_to_check=['filtered_func_data.nii.gz','stats/res4d.nii.gz','reg/example_func2standard.mat','reg/highres2standard_warp.nii.gz']
+    for s in files_to_check:
+        if not os.path.exists(featdir+'/'+s):
+            status['files'][s]=0
+            print 'missing: '+featdir+'/'+s
+            badness+=1
+        else:
+            status['files'][s]=1
+
+
+    status['zstats']={}
+    ncontrasts=design['fmri(ncon_orig)']
+    for c in range(ncontrasts):
+        if not os.path.exists(featdir+'/stats/zstat%d.nii.gz'%int(c+1)):
+            status['zstats'][c+1]=0
+            badness+=1
+        else:
+            status['zstats'][c+1]=1
+            
+    if badness>0:
+        print 'found %d problems'%badness
+
+    return badness,status
 
 if __name__ == '__main__':
     main()
