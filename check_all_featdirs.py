@@ -27,9 +27,8 @@ USAGE: check_featdir <basedir>
 ## ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os,sys
-import numpy as N
-
 from check_featdir import *
+
 
 def usage():
     """ print the docstring and exit"""
@@ -44,6 +43,8 @@ def main():
     check_all_featdirs(sys.argv[1])
     
 def check_all_featdirs(basedir):
+    import numpy as N
+   
     if not os.path.exists(basedir):
         print basedir+' does not exist!'
         usage()
